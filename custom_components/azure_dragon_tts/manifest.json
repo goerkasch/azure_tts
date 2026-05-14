@@ -1,0 +1,13 @@
+{
+  "domain": "azure_dragon_tts",
+  "name": "Azure Dragon TTS",
+  "after_dependencies": ["tts"],
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["tts"],
+  "documentation": "https://learn.microsoft.com/azure/ai-services/speech-service/text-to-speech",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "version": "0.1.0"
+}

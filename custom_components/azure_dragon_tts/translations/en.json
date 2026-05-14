@@ -1,0 +1,39 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Azure Dragon TTS",
+        "description": "Configure Azure Speech text-to-speech.",
+        "data": {
+          "api_key": "Azure Speech key",
+          "name": "Name",
+          "language": "Language",
+          "region": "Azure region",
+          "voice": "Voice",
+          "output_format": "Output format",
+          "style": "Style",
+          "rate": "Rate",
+          "pitch": "Pitch"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Azure Dragon TTS options",
+        "data": {
+          "api_key": "Azure Speech key",
+          "name": "Name",
+          "language": "Language",
+          "region": "Azure region",
+          "voice": "Voice",
+          "output_format": "Output format",
+          "style": "Style",
+          "rate": "Rate",
+          "pitch": "Pitch"
+        }
+      }
+    }
+  }
+}
