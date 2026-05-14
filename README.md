@@ -24,7 +24,7 @@ If you install this repository as a HACS custom repository, add it as type `Inte
 https://github.com/goerkasch/azure_tts
 ```
 
-For updates, use GitHub releases such as `v0.2.0`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
+For updates, use GitHub releases such as `v0.2.1`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
 
 ## Configuration
 

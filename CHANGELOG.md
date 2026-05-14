@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 - 2026-05-14
+
+- Fixed the Azure voice dropdown rendering blank rows by switching to Home Assistant's native select selector.
+- Bumped integration version from `0.2.0` to `0.2.1`.
+
 ## 0.2.0 - 2026-05-14
 
 - Added dynamic Azure voice loading through the Azure Speech `voices/list` REST endpoint.
