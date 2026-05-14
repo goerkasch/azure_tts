@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.6 - 2026-05-14
+
+- Updated GitHub workflows to use `actions/checkout@v5`.
+- Opted GitHub workflows into Node.js 24 actions with `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24`.
+- Bumped integration version from `0.2.5` to `0.2.6`.
+
 ## 0.2.5 - 2026-05-14
 
 - Changed the voice dropdown to a plain list of Azure voice short names for maximum Home Assistant frontend compatibility.
