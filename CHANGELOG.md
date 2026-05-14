@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2 - 2026-05-14
+
+- Added GitHub Actions for HACS and Hassfest validation.
+- Added GitHub `CODEOWNERS`.
+- Added manifest code owner for `@goerkasch`.
+- Bumped integration version from `0.2.1` to `0.2.2`.
+
 ## 0.2.1 - 2026-05-14
 
 - Fixed the Azure voice dropdown rendering blank rows by switching to Home Assistant's native select selector.
