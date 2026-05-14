@@ -149,6 +149,24 @@ data:
   language: de-DE
 ```
 
+## Performance
+
+Azure Speech is a cloud service, so speech output is not instant. Home Assistant has to send the text to Azure, wait for the synthesized audio, and then hand it to the selected media player.
+
+Typical causes of delay:
+
+- Long or dynamic messages, such as full morning briefings.
+- Slow response from Azure Speech or the selected Azure region.
+- Media players that need a moment before playback starts.
+- First playback after a Home Assistant restart.
+
+Tips:
+
+- Use the Azure region closest to your Home Assistant instance.
+- Keep frequently used announcements short.
+- Prefer MP3 output formats for broad media player compatibility.
+- For repeated identical messages, Home Assistant's TTS cache may make later playback faster.
+
 ## YAML fallback
 
 The integration also keeps YAML platform setup available:
