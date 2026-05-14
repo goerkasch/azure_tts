@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.4 - 2026-05-14
+
+- Added local HACS brand asset at `custom_components/azure_dragon_tts/brand/icon.png`.
+- Bumped integration version from `0.2.3` to `0.2.4`.
+
 ## 0.2.3 - 2026-05-14
 
 - Fixed blank voice dropdown labels by using Home Assistant's raw selector schema.
