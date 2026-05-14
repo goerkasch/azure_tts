@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 - 2026-05-14
+
+- Added a dropdown selector for common Azure speaking styles.
+- Bumped integration version from `0.3.0` to `0.3.1`.
+
 ## 0.3.0 - 2026-05-14
 
 - Added dropdown selectors for language, Azure region, and output format.

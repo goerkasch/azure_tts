@@ -7,6 +7,7 @@ DEFAULT_NAME = "Azure Dragon TTS"
 DEFAULT_REGION = "westeurope"
 DEFAULT_VOICE = "de-DE-Seraphina:DragonHDLatestNeural"
 DEFAULT_OUTPUT_FORMAT = "audio-24khz-48kbitrate-mono-mp3"
+DEFAULT_STYLE = "none"
 DEFAULT_RATE = "0%"
 DEFAULT_PITCH = "0%"
 USER_AGENT = "home-assistant-azure-dragon-tts"
@@ -58,6 +59,44 @@ SUPPORTED_OUTPUT_FORMATS = [
     "riff-16khz-16bit-mono-pcm",
     "riff-24khz-16bit-mono-pcm",
     "riff-48khz-16bit-mono-pcm",
+]
+
+SUPPORTED_STYLES = [
+    "none",
+    "advertisement_upbeat",
+    "affectionate",
+    "angry",
+    "assistant",
+    "calm",
+    "chat",
+    "cheerful",
+    "customerservice",
+    "depressed",
+    "disgruntled",
+    "documentary-narration",
+    "embarrassed",
+    "empathetic",
+    "envious",
+    "excited",
+    "fearful",
+    "friendly",
+    "gentle",
+    "hopeful",
+    "lyrical",
+    "narration-professional",
+    "narration-relaxed",
+    "newscast",
+    "newscast-casual",
+    "newscast-formal",
+    "poetry-reading",
+    "sad",
+    "serious",
+    "shouting",
+    "sports_commentary",
+    "sports_commentary_excited",
+    "terrified",
+    "unfriendly",
+    "whispering",
 ]
 
 CONF_REGION = "region"

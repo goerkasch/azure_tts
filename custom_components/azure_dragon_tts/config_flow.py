@@ -25,11 +25,13 @@ from .const import (
     DEFAULT_PITCH,
     DEFAULT_RATE,
     DEFAULT_REGION,
+    DEFAULT_STYLE,
     DEFAULT_VOICE,
     DOMAIN,
     SUPPORTED_LANGUAGES,
     SUPPORTED_OUTPUT_FORMATS,
     SUPPORTED_REGIONS,
+    SUPPORTED_STYLES,
 )
 
 _REQUIRED_STRING = vol.All(cv.string, vol.Strip, vol.Length(min=1))
@@ -57,7 +59,9 @@ def _base_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
                 CONF_OUTPUT_FORMAT,
                 default=defaults.get(CONF_OUTPUT_FORMAT, DEFAULT_OUTPUT_FORMAT),
             ): _select(SUPPORTED_OUTPUT_FORMATS, defaults.get(CONF_OUTPUT_FORMAT)),
-            vol.Optional(CONF_STYLE, default=defaults.get(CONF_STYLE, "")): _OPTIONAL_STRING,
+            vol.Optional(
+                CONF_STYLE, default=defaults.get(CONF_STYLE, DEFAULT_STYLE)
+            ): _select(SUPPORTED_STYLES, defaults.get(CONF_STYLE)),
             vol.Optional(
                 CONF_RATE, default=defaults.get(CONF_RATE, DEFAULT_RATE)
             ): _REQUIRED_STRING,
@@ -97,7 +101,7 @@ def _voice_schema(options: dict[str, str], default_voice: str) -> vol.Schema:
 def _clean_input(user_input: dict[str, Any]) -> dict[str, Any]:
     """Drop empty optional values."""
     cleaned = dict(user_input)
-    if not cleaned.get(CONF_STYLE):
+    if not cleaned.get(CONF_STYLE) or cleaned.get(CONF_STYLE) == DEFAULT_STYLE:
         cleaned.pop(CONF_STYLE, None)
     return cleaned
 

@@ -2,7 +2,23 @@
 
 Custom integration to use Azure Speech text-to-speech voices, including direct SSML voice names such as `de-DE-Seraphina:DragonHDLatestNeural`, in Home Assistant.
 
-## Installation
+## HACS
+
+If you install this repository as a HACS custom repository, add it as type `Integration`:
+
+```text
+https://github.com/goerkasch/azure_tts
+```
+
+After installation, restart Home Assistant and add the integration from:
+
+```text
+Settings > Devices & services > Add integration > Azure Dragon TTS
+```
+
+For updates, use GitHub releases such as `v0.3.1`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
+
+## Manual installation
 
 Copy the folder `custom_components/azure_dragon_tts` into your Home Assistant config directory:
 
@@ -14,30 +30,6 @@ Restart Home Assistant, then add the integration from:
 
 ```text
 Settings > Devices & services > Add integration > Azure Dragon TTS
-```
-
-## HACS
-
-If you install this repository as a HACS custom repository, add it as type `Integration`:
-
-```text
-https://github.com/goerkasch/azure_tts
-```
-
-For updates, use GitHub releases such as `v0.3.0`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
-
-To prepare this repository for the HACS default repository list, keep the HACS and Hassfest GitHub Actions passing, publish a GitHub release for each version, and add the integration domain `azure_dragon_tts` to the Home Assistant Brands repository.
-
-The GitHub repository also needs a description and topics in the repository settings. Suggested description:
-
-```text
-Home Assistant custom integration for Azure Speech text-to-speech.
-```
-
-Suggested topics:
-
-```text
-home-assistant, hacs, custom-integration, tts, azure, azure-speech
 ```
 
 ## Configuration
@@ -57,6 +49,105 @@ Useful defaults:
 
 When you configure the integration through the UI, the integration loads the available voices from Azure and shows them in a dropdown. The list depends on the Azure Speech region and key you enter.
 The UI also provides dropdowns for language, Azure region, and output format. The voice list is filtered by the selected language.
+
+Supported UI language presets:
+
+```text
+de-DE, en-US, en-GB, fr-FR, es-ES, it-IT, nl-NL, pl-PL
+```
+
+Supported UI output format presets include MP3, Opus, and RIFF PCM formats. Existing custom YAML values are still accepted.
+
+### Voice tuning
+
+The integration supports three optional voice tuning fields:
+
+- `style`: Azure speaking style, for example cheerful, sad, friendly, or newscast.
+- `rate`: Speaking speed. Use values such as `0%`, `+10%`, `-10%`, `+25%`, or `-25%`.
+- `pitch`: Speaking pitch. Use values such as `0%`, `+5%`, `-5%`, `+10%`, or `-10%`.
+
+In the UI, `style` is available as a dropdown. Choose `none` to disable Azure speaking styles.
+
+Recommended stable defaults:
+
+```text
+style: none
+rate: 0%
+pitch: 0%
+```
+
+Common Azure style values include:
+
+```text
+advertisement_upbeat
+affectionate
+angry
+assistant
+calm
+chat
+cheerful
+customerservice
+depressed
+disgruntled
+documentary-narration
+embarrassed
+empathetic
+envious
+excited
+fearful
+friendly
+gentle
+hopeful
+lyrical
+narration-professional
+narration-relaxed
+newscast
+newscast-casual
+newscast-formal
+poetry-reading
+sad
+serious
+shouting
+sports_commentary
+sports_commentary_excited
+whispering
+terrified
+unfriendly
+```
+
+Not every Azure voice supports every style. If Azure rejects a request, leave `style` empty first and test again. `rate` and `pitch` are applied with SSML prosody and are generally safer to adjust.
+
+## Assist
+
+The integration exposes Azure voices to Home Assistant Assist. In your voice assistant settings, select:
+
+```text
+Text-to-speech: Azure Dragon TTS
+Language: your language, for example Deutsch (Deutschland)
+Voice: one of the Azure voices for that language
+```
+
+If the voice dropdown is empty after an update, restart Home Assistant and reopen the voice assistant settings.
+
+## Testing
+
+You can test the integration from:
+
+```text
+Developer tools > Actions
+```
+
+Example action:
+
+```yaml
+action: tts.speak
+target:
+  entity_id: tts.azure_dragon_tts
+data:
+  media_player_entity_id: media_player.your_player
+  message: "Hallo, dies ist ein Test mit Azure Dragon TTS."
+  language: de-DE
+```
 
 ## YAML fallback
 
@@ -98,4 +189,20 @@ You can also avoid YAML secrets entirely by adding the integration through the U
 
 ```text
 Settings > Devices & services > Add integration > Azure Dragon TTS
+```
+
+### HACS default repository preparation
+
+To prepare this repository for the HACS default repository list, keep the HACS and Hassfest GitHub Actions passing, publish a GitHub release for each version, and add the integration domain `azure_dragon_tts` to the Home Assistant Brands repository.
+
+The GitHub repository also needs a description and topics in the repository settings. Suggested description:
+
+```text
+Home Assistant custom integration for Azure Speech text-to-speech.
+```
+
+Suggested topics:
+
+```text
+home-assistant, hacs, custom-integration, tts, azure, azure-speech
 ```
