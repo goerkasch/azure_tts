@@ -85,3 +85,24 @@ def voice_options(
     if not options:
         options[fallback_voice] = fallback_voice
     return options
+
+
+def style_options(
+    voices: list[dict[str, Any]], voice_name: str, current_style: str | None = None
+) -> list[str]:
+    """Build style options from Azure metadata for a selected voice."""
+    options = ["none"]
+    for voice in voices:
+        if voice.get("ShortName") != voice_name:
+            continue
+
+        style_list = voice.get("StyleList")
+        if isinstance(style_list, list):
+            options.extend(str(style) for style in style_list if style)
+        break
+
+    if current_style and current_style != "none" and current_style not in options:
+        options.append(current_style)
+
+    unique_options = list(dict.fromkeys(options))
+    return ["none", *sorted(option for option in unique_options if option != "none")]

@@ -16,7 +16,7 @@ After installation, restart Home Assistant and add the integration from:
 Settings > Devices & services > Add integration > Azure Dragon TTS
 ```
 
-For updates, use GitHub releases such as `v0.3.1`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
+For updates, use GitHub releases such as `v0.4.0`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
 
 ## Manual installation
 
@@ -66,7 +66,7 @@ The integration supports three optional voice tuning fields:
 - `rate`: Speaking speed. Use values such as `0%`, `+10%`, `-10%`, `+25%`, or `-25%`.
 - `pitch`: Speaking pitch. Use values such as `0%`, `+5%`, `-5%`, `+10%`, or `-10%`.
 
-In the UI, `style` is available as a dropdown. Choose `none` to disable Azure speaking styles.
+In the UI, `style` is available as a dropdown after selecting a voice. The dropdown is built from the selected voice's Azure metadata. Choose `none` to disable Azure speaking styles.
 
 Recommended stable defaults:
 
@@ -76,7 +76,7 @@ rate: 0%
 pitch: 0%
 ```
 
-Common Azure style values include:
+Common Azure style values can include:
 
 ```text
 advertisement_upbeat
@@ -115,7 +115,7 @@ terrified
 unfriendly
 ```
 
-Not every Azure voice supports every style. If Azure rejects a request, leave `style` empty first and test again. `rate` and `pitch` are applied with SSML prosody and are generally safer to adjust.
+Not every Azure voice supports every style. The integration filters the style dropdown by the selected voice when Azure provides style metadata. If Azure still rejects a request, choose `none` first and test again. `rate` and `pitch` are applied with SSML prosody and are generally safer to adjust.
 
 ## Assist
 

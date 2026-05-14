@@ -61,44 +61,6 @@ SUPPORTED_OUTPUT_FORMATS = [
     "riff-48khz-16bit-mono-pcm",
 ]
 
-SUPPORTED_STYLES = [
-    "none",
-    "advertisement_upbeat",
-    "affectionate",
-    "angry",
-    "assistant",
-    "calm",
-    "chat",
-    "cheerful",
-    "customerservice",
-    "depressed",
-    "disgruntled",
-    "documentary-narration",
-    "embarrassed",
-    "empathetic",
-    "envious",
-    "excited",
-    "fearful",
-    "friendly",
-    "gentle",
-    "hopeful",
-    "lyrical",
-    "narration-professional",
-    "narration-relaxed",
-    "newscast",
-    "newscast-casual",
-    "newscast-formal",
-    "poetry-reading",
-    "sad",
-    "serious",
-    "shouting",
-    "sports_commentary",
-    "sports_commentary_excited",
-    "terrified",
-    "unfriendly",
-    "whispering",
-]
-
 CONF_REGION = "region"
 CONF_VOICE = "voice"
 CONF_OUTPUT_FORMAT = "output_format"
