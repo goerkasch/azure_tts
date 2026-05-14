@@ -206,3 +206,15 @@ Suggested topics:
 ```text
 home-assistant, hacs, custom-integration, tts, azure, azure-speech
 ```
+
+## License
+
+This project is licensed under the MIT License. See `LICENSE` for details.
+
+## Notes
+
+This integration sends text to the configured Azure Speech resource to generate audio. Azure usage may create costs depending on your Azure subscription and Speech service quota.
+
+Parts of this project were created with AI assistance and reviewed during development.
+
+This project is not affiliated with or endorsed by Microsoft, Azure, or Home Assistant. Azure and Home Assistant names are used only to describe compatibility.
