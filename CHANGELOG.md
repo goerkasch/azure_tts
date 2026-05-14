@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 - 2026-05-14
+
+- Added dynamic style loading from Azure voice metadata.
+- Moved style selection after voice selection so only styles supported by the selected voice are shown.
+- Kept `none` as the safe default style.
+- Bumped integration version from `0.3.1` to `0.4.0`.
+
 ## 0.3.1 - 2026-05-14
 
 - Added a dropdown selector for common Azure speaking styles.
