@@ -25,6 +25,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 
+from .api import AzureTtsError, async_get_voices
 from .const import (
     CONF_OUTPUT_FORMAT,
     CONF_PITCH,
@@ -78,14 +79,18 @@ async def async_setup_entry(
 ) -> None:
     """Set up Azure Dragon TTS from a config entry."""
     config = {**entry.data, **entry.options}
-    async_add_entities([AzureDragonTtsEntity(hass, config)])
+    entity = AzureDragonTtsEntity(hass, config)
+    await entity.async_load_voices()
+    async_add_entities([entity])
 
 
 async def async_setup_platform(
     hass: HomeAssistant, config: dict[str, Any], async_add_entities, discovery_info=None
 ) -> None:
     """Set up the Azure Dragon TTS platform from YAML."""
-    async_add_entities([AzureDragonTtsEntity(hass, config)])
+    entity = AzureDragonTtsEntity(hass, config)
+    await entity.async_load_voices()
+    async_add_entities([entity])
 
 
 class AzureDragonTtsEntity(TextToSpeechEntity):
@@ -105,13 +110,31 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
         self._style = config.get(CONF_STYLE) or None
         self._rate = config.get(CONF_RATE, DEFAULT_RATE)
         self._pitch = config.get(CONF_PITCH, DEFAULT_PITCH)
+        self._voices: list[dict[str, Any]] = []
+        self._languages = SUPPORT_LANGUAGES
         self._attr_unique_id = f"azure_dragon_tts_{self._region}_{self._voice}"
         self._attr_name = self._name
+
+    async def async_load_voices(self) -> None:
+        """Load available voices from Azure for Home Assistant voice dropdowns."""
+        try:
+            self._voices = await async_get_voices(self.hass, self._api_key, self._region)
+        except AzureTtsError as err:
+            _LOGGER.warning("Could not load Azure voice list: %s", err)
+            return
+
+        languages = {
+            str(voice["Locale"])
+            for voice in self._voices
+            if voice.get("Locale")
+        }
+        languages.add(self._language)
+        self._languages = sorted(languages)
 
     @property
     def supported_languages(self) -> list[str]:
         """Return supported languages."""
-        return SUPPORT_LANGUAGES
+        return self._languages
 
     @property
     def default_language(self) -> str:
@@ -138,16 +161,17 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
 
     @callback
     def async_get_supported_voices(self, language: str) -> list[str] | None:
-        """Return a small set of known voices for the selected language."""
-        if language.lower().startswith("de"):
-            return [
-                "de-DE-Seraphina:DragonHDLatestNeural",
-                "de-DE-SeraphinaMultilingualNeural",
-                "de-DE-AmalaNeural",
-                "de-DE-KatjaNeural",
-                "de-DE-ConradNeural",
-            ]
-        return [self._voice]
+        """Return Azure voices for the selected language."""
+        if not self._voices:
+            return [self._voice]
+
+        language = language.lower()
+        voices = [
+            str(voice["ShortName"])
+            for voice in self._voices
+            if not language or str(voice.get("Locale", "")).lower() == language
+        ]
+        return voices or [self._voice]
 
     async def async_get_tts_audio(
         self, message: str, language: str, options: dict[str, Any]

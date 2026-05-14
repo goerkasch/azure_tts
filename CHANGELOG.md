@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 - 2026-05-14
+
+- Added dynamic Azure voice loading through the Azure Speech `voices/list` REST endpoint.
+- Added a voice dropdown to the config flow and options flow.
+- Added dynamic Home Assistant TTS voice and language lists from Azure voice metadata.
+- Bumped integration version from `0.1.2` to `0.2.0`.
+
 ## 0.1.2 - 2026-05-14
 
 - Added root `hacs.json` metadata for HACS.

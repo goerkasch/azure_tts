@@ -1,5 +1,8 @@
 {
   "config": {
+    "error": {
+      "cannot_connect": "Could not load Azure voices. Check the Speech key and region."
+    },
     "step": {
       "user": {
         "title": "Azure Dragon TTS",
@@ -9,16 +12,25 @@
           "name": "Name",
           "language": "Language",
           "region": "Azure region",
-          "voice": "Voice",
           "output_format": "Output format",
           "style": "Style",
           "rate": "Rate",
           "pitch": "Pitch"
         }
+      },
+      "voice": {
+        "title": "Azure Dragon TTS voice",
+        "description": "Choose one of the voices available for your Azure Speech resource.",
+        "data": {
+          "voice": "Voice"
+        }
       }
     }
   },
   "options": {
+    "error": {
+      "cannot_connect": "Could not load Azure voices. Check the Speech key and region."
+    },
     "step": {
       "init": {
         "title": "Azure Dragon TTS options",
@@ -27,11 +39,16 @@
           "name": "Name",
           "language": "Language",
           "region": "Azure region",
-          "voice": "Voice",
           "output_format": "Output format",
           "style": "Style",
           "rate": "Rate",
           "pitch": "Pitch"
+        }
+      },
+      "voice": {
+        "title": "Azure Dragon TTS voice",
+        "data": {
+          "voice": "Voice"
         }
       }
     }

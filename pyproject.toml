@@ -1,6 +1,6 @@
 [project]
 name = "azure-dragon-tts"
-version = "0.1.2"
+version = "0.2.0"
 description = "Home Assistant custom integration for Azure Speech text-to-speech voices."
 readme = "README.md"
 requires-python = ">=3.12"

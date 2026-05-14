@@ -1,5 +1,8 @@
 {
   "config": {
+    "error": {
+      "cannot_connect": "Azure-Stimmen konnten nicht geladen werden. Pruefe Speech-Schluessel und Region."
+    },
     "step": {
       "user": {
         "title": "Azure Dragon TTS",
@@ -9,16 +12,25 @@
           "name": "Name",
           "language": "Sprache",
           "region": "Azure-Region",
-          "voice": "Stimme",
           "output_format": "Ausgabeformat",
           "style": "Stil",
           "rate": "Geschwindigkeit",
           "pitch": "Tonhoehe"
         }
+      },
+      "voice": {
+        "title": "Azure Dragon TTS Stimme",
+        "description": "Waehle eine der Stimmen, die fuer deine Azure Speech-Ressource verfuegbar sind.",
+        "data": {
+          "voice": "Stimme"
+        }
       }
     }
   },
   "options": {
+    "error": {
+      "cannot_connect": "Azure-Stimmen konnten nicht geladen werden. Pruefe Speech-Schluessel und Region."
+    },
     "step": {
       "init": {
         "title": "Azure Dragon TTS Optionen",
@@ -27,11 +39,16 @@
           "name": "Name",
           "language": "Sprache",
           "region": "Azure-Region",
-          "voice": "Stimme",
           "output_format": "Ausgabeformat",
           "style": "Stil",
           "rate": "Geschwindigkeit",
           "pitch": "Tonhoehe"
+        }
+      },
+      "voice": {
+        "title": "Azure Dragon TTS Stimme",
+        "data": {
+          "voice": "Stimme"
         }
       }
     }

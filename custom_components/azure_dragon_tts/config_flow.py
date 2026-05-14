@@ -10,6 +10,7 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_API_KEY, CONF_LANGUAGE, CONF_NAME
 import homeassistant.helpers.config_validation as cv
 
+from .api import AzureTtsError, async_get_voices, voice_options
 from .const import (
     CONF_OUTPUT_FORMAT,
     CONF_PITCH,
@@ -31,8 +32,8 @@ _REQUIRED_STRING = vol.All(cv.string, vol.Strip, vol.Length(min=1))
 _OPTIONAL_STRING = vol.All(cv.string, vol.Strip)
 
 
-def _schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
-    """Build a schema with optional defaults."""
+def _base_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
+    """Build the schema for connection and synthesis defaults."""
     defaults = defaults or {}
     return vol.Schema(
         {
@@ -49,9 +50,6 @@ def _schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
                 CONF_REGION, default=defaults.get(CONF_REGION, DEFAULT_REGION)
             ): _REQUIRED_STRING,
             vol.Optional(
-                CONF_VOICE, default=defaults.get(CONF_VOICE, DEFAULT_VOICE)
-            ): _REQUIRED_STRING,
-            vol.Optional(
                 CONF_OUTPUT_FORMAT,
                 default=defaults.get(CONF_OUTPUT_FORMAT, DEFAULT_OUTPUT_FORMAT),
             ): _REQUIRED_STRING,
@@ -62,6 +60,15 @@ def _schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
             vol.Optional(
                 CONF_PITCH, default=defaults.get(CONF_PITCH, DEFAULT_PITCH)
             ): _REQUIRED_STRING,
+        }
+    )
+
+
+def _voice_schema(options: dict[str, str], default_voice: str) -> vol.Schema:
+    """Build a voice selection schema."""
+    return vol.Schema(
+        {
+            vol.Required(CONF_VOICE, default=default_voice): vol.In(options),
         }
     )
 
@@ -78,13 +85,37 @@ class AzureDragonTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle an Azure Dragon TTS config flow."""
 
     VERSION = 1
+    _config: dict[str, Any]
+    _voice_options: dict[str, str]
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
         """Handle the initial step."""
         if user_input is not None:
-            cleaned = _clean_input(user_input)
+            self._config = _clean_input(user_input)
+            try:
+                voices = await async_get_voices(
+                    self.hass, self._config[CONF_API_KEY], self._config[CONF_REGION]
+                )
+            except AzureTtsError:
+                return self.async_show_form(
+                    step_id="user",
+                    data_schema=_base_schema(user_input),
+                    errors={"base": "cannot_connect"},
+                )
+
+            self._voice_options = voice_options(voices, DEFAULT_VOICE)
+            return await self.async_step_voice()
+
+        return self.async_show_form(step_id="user", data_schema=_base_schema())
+
+    async def async_step_voice(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Handle voice selection."""
+        if user_input is not None:
+            cleaned = {**self._config, **_clean_input(user_input)}
             await self.async_set_unique_id(
                 f"{cleaned[CONF_REGION]}_{cleaned[CONF_VOICE]}"
             )
@@ -93,7 +124,10 @@ class AzureDragonTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 title=cleaned.get(CONF_NAME, DEFAULT_NAME), data=cleaned
             )
 
-        return self.async_show_form(step_id="user", data_schema=_schema())
+        return self.async_show_form(
+            step_id="voice",
+            data_schema=_voice_schema(self._voice_options, DEFAULT_VOICE),
+        )
 
     @staticmethod
     def async_get_options_flow(
@@ -108,13 +142,48 @@ class AzureDragonTtsOptionsFlow(config_entries.OptionsFlow):
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         self._config_entry = config_entry
+        self._config: dict[str, Any] = {}
+        self._voice_options: dict[str, str] = {}
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
         """Manage Azure Dragon TTS options."""
         if user_input is not None:
-            return self.async_create_entry(title="", data=_clean_input(user_input))
+            self._config = _clean_input(user_input)
+            try:
+                voices = await async_get_voices(
+                    self.hass, self._config[CONF_API_KEY], self._config[CONF_REGION]
+                )
+            except AzureTtsError:
+                return self.async_show_form(
+                    step_id="init",
+                    data_schema=_base_schema(user_input),
+                    errors={"base": "cannot_connect"},
+                )
+
+            default_voice = self._config_entry.options.get(
+                CONF_VOICE, self._config_entry.data.get(CONF_VOICE, DEFAULT_VOICE)
+            )
+            self._voice_options = voice_options(voices, default_voice)
+            return await self.async_step_voice()
 
         defaults = {**self._config_entry.data, **self._config_entry.options}
-        return self.async_show_form(step_id="init", data_schema=_schema(defaults))
+        return self.async_show_form(step_id="init", data_schema=_base_schema(defaults))
+
+    async def async_step_voice(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Manage Azure Dragon TTS voice selection."""
+        if user_input is not None:
+            return self.async_create_entry(
+                title="", data={**self._config, **_clean_input(user_input)}
+            )
+
+        default_voice = self._config_entry.options.get(
+            CONF_VOICE, self._config_entry.data.get(CONF_VOICE, DEFAULT_VOICE)
+        )
+        return self.async_show_form(
+            step_id="voice",
+            data_schema=_voice_schema(self._voice_options, default_voice),
+        )
