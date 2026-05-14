@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.7 - 2026-05-14
+
+- Fixed Assist voice selection by returning Home Assistant `Voice` objects from `async_get_supported_voices`.
+- Added language-prefix matching so `de` and `de-DE` both resolve Azure German voices.
+- Bumped integration version from `0.2.6` to `0.2.7`.
+
 ## 0.2.6 - 2026-05-14
 
 - Updated GitHub workflows to use `actions/checkout@v5`.

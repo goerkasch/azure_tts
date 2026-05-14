@@ -13,6 +13,11 @@ import voluptuous as vol
 from homeassistant.components.tts import PLATFORM_SCHEMA, TextToSpeechEntity
 
 try:
+    from homeassistant.components.tts import Voice
+except ImportError:  # Older HA versions
+    Voice = None  # type: ignore[assignment]
+
+try:
     from homeassistant.components.tts import TTSAudioRequest, TTSAudioResponse
 except ImportError:  # Older HA versions
     TTSAudioRequest = None  # type: ignore[assignment]
@@ -160,18 +165,18 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
         return options
 
     @callback
-    def async_get_supported_voices(self, language: str) -> list[str] | None:
+    def async_get_supported_voices(self, language: str):
         """Return Azure voices for the selected language."""
         if not self._voices:
-            return [self._voice]
+            return [_voice_item(self._voice, self._voice)]
 
-        language = language.lower()
+        language = (language or "").lower()
         voices = [
-            str(voice["ShortName"])
+            _voice_item(str(voice["ShortName"]), _voice_label(voice))
             for voice in self._voices
-            if not language or str(voice.get("Locale", "")).lower() == language
+            if _voice_matches_language(voice, language)
         ]
-        return voices or [self._voice]
+        return voices or [_voice_item(self._voice, self._voice)]
 
     async def async_get_tts_audio(
         self, message: str, language: str, options: dict[str, Any]
@@ -279,3 +284,39 @@ def _audio_extension(output_format: str) -> str:
         if marker in output_format:
             return extension
     return "mp3"
+
+
+def _voice_matches_language(voice: dict[str, Any], language: str) -> bool:
+    """Return if an Azure voice matches a Home Assistant language tag."""
+    if not language:
+        return True
+
+    locale = str(voice.get("Locale", "")).lower()
+    if locale == language:
+        return True
+
+    return locale.split("-", 1)[0] == language.split("-", 1)[0]
+
+
+def _voice_label(voice: dict[str, Any]) -> str:
+    """Return a readable voice label for Home Assistant Assist."""
+    short_name = str(voice["ShortName"])
+    locale = str(voice.get("Locale", ""))
+    local_name = str(voice.get("LocalName") or voice.get("DisplayName") or short_name)
+    gender = str(voice.get("Gender", ""))
+
+    parts = [short_name]
+    if locale:
+        parts.append(locale)
+    if gender:
+        parts.append(gender)
+    if local_name != short_name:
+        parts.append(local_name)
+    return " - ".join(parts)
+
+
+def _voice_item(voice_id: str, name: str):
+    """Return a modern HA Voice object, or a string for older HA versions."""
+    if Voice is None:
+        return voice_id
+    return Voice(voice_id=voice_id, name=name)
