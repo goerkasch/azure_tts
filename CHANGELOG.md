@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3 - 2026-05-14
+
+- Fixed blank voice dropdown labels by using Home Assistant's raw selector schema.
+- Changed voice labels to start with the Azure `ShortName` for reliable display.
+- Bumped integration version from `0.2.2` to `0.2.3`.
+
 ## 0.2.2 - 2026-05-14
 
 - Added GitHub Actions for HACS and Hassfest validation.

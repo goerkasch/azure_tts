@@ -8,11 +8,7 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_API_KEY, CONF_LANGUAGE, CONF_NAME
-from homeassistant.helpers.selector import (
-    SelectOptionDict,
-    SelectSelector,
-    SelectSelectorConfig,
-)
+from homeassistant.helpers.selector import selector
 import homeassistant.helpers.config_validation as cv
 
 from .api import AzureTtsError, async_get_voices, voice_options
@@ -72,12 +68,18 @@ def _base_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
 def _voice_schema(options: dict[str, str], default_voice: str) -> vol.Schema:
     """Build a voice selection schema."""
     select_options = [
-        SelectOptionDict(value=value, label=label) for value, label in options.items()
+        {"value": value, "label": label or value} for value, label in options.items()
     ]
     return vol.Schema(
         {
-            vol.Required(CONF_VOICE, default=default_voice): SelectSelector(
-                SelectSelectorConfig(options=select_options, mode="dropdown")
+            vol.Required(CONF_VOICE, default=default_voice): selector(
+                {
+                    "select": {
+                        "options": select_options,
+                        "mode": "dropdown",
+                        "sort": True,
+                    }
+                }
             ),
         }
     )

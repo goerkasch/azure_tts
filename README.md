@@ -24,7 +24,7 @@ If you install this repository as a HACS custom repository, add it as type `Inte
 https://github.com/goerkasch/azure_tts
 ```
 
-For updates, use GitHub releases such as `v0.2.2`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
+For updates, use GitHub releases such as `v0.2.3`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
 
 To prepare this repository for the HACS default repository list, keep the HACS and Hassfest GitHub Actions passing, publish a GitHub release for each version, and add the integration domain `azure_dragon_tts` to the Home Assistant Brands repository.
 

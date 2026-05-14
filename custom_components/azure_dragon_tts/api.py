@@ -64,12 +64,13 @@ def voice_options(voices: list[dict[str, Any]], fallback_voice: str) -> dict[str
         local_name = str(voice.get("LocalName") or voice.get("DisplayName") or short_name)
         gender = str(voice.get("Gender", ""))
 
-        label_parts = [local_name]
+        label_parts = [short_name]
         if locale:
             label_parts.append(locale)
         if gender:
             label_parts.append(gender)
-        label_parts.append(short_name)
+        if local_name != short_name:
+            label_parts.append(local_name)
         options[short_name] = " - ".join(label_parts)
 
     options.setdefault(fallback_voice, fallback_voice)
