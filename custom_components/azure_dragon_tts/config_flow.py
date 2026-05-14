@@ -27,6 +27,9 @@ from .const import (
     DEFAULT_REGION,
     DEFAULT_VOICE,
     DOMAIN,
+    SUPPORTED_LANGUAGES,
+    SUPPORTED_OUTPUT_FORMATS,
+    SUPPORTED_REGIONS,
 )
 
 _REQUIRED_STRING = vol.All(cv.string, vol.Strip, vol.Length(min=1))
@@ -46,14 +49,14 @@ def _base_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
             ): _REQUIRED_STRING,
             vol.Optional(
                 CONF_LANGUAGE, default=defaults.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
-            ): _REQUIRED_STRING,
+            ): _select(SUPPORTED_LANGUAGES, defaults.get(CONF_LANGUAGE)),
             vol.Optional(
                 CONF_REGION, default=defaults.get(CONF_REGION, DEFAULT_REGION)
-            ): _REQUIRED_STRING,
+            ): _select(SUPPORTED_REGIONS, defaults.get(CONF_REGION)),
             vol.Optional(
                 CONF_OUTPUT_FORMAT,
                 default=defaults.get(CONF_OUTPUT_FORMAT, DEFAULT_OUTPUT_FORMAT),
-            ): _REQUIRED_STRING,
+            ): _select(SUPPORTED_OUTPUT_FORMATS, defaults.get(CONF_OUTPUT_FORMAT)),
             vol.Optional(CONF_STYLE, default=defaults.get(CONF_STYLE, "")): _OPTIONAL_STRING,
             vol.Optional(
                 CONF_RATE, default=defaults.get(CONF_RATE, DEFAULT_RATE)
@@ -65,19 +68,28 @@ def _base_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
     )
 
 
+def _select(options: list[str], current_value: str | None = None):
+    """Build a simple Home Assistant dropdown selector."""
+    select_options = list(options)
+    if current_value and current_value not in select_options:
+        select_options.append(current_value)
+
+    return selector(
+        {
+            "select": {
+                "options": select_options,
+                "mode": "dropdown",
+            }
+        }
+    )
+
+
 def _voice_schema(options: dict[str, str], default_voice: str) -> vol.Schema:
     """Build a voice selection schema."""
     select_options = sorted(options)
     return vol.Schema(
         {
-            vol.Required(CONF_VOICE, default=default_voice): selector(
-                {
-                    "select": {
-                        "options": select_options,
-                        "mode": "dropdown",
-                    }
-                }
-            ),
+            vol.Required(CONF_VOICE, default=default_voice): _select(select_options),
         }
     )
 
@@ -114,7 +126,9 @@ class AzureDragonTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     errors={"base": "cannot_connect"},
                 )
 
-            self._voice_options = voice_options(voices, DEFAULT_VOICE)
+            self._voice_options = voice_options(
+                voices, DEFAULT_VOICE, self._config[CONF_LANGUAGE]
+            )
             return await self.async_step_voice()
 
         return self.async_show_form(step_id="user", data_schema=_base_schema())
@@ -174,7 +188,9 @@ class AzureDragonTtsOptionsFlow(config_entries.OptionsFlow):
             default_voice = self._config_entry.options.get(
                 CONF_VOICE, self._config_entry.data.get(CONF_VOICE, DEFAULT_VOICE)
             )
-            self._voice_options = voice_options(voices, default_voice)
+            self._voice_options = voice_options(
+                voices, default_voice, self._config[CONF_LANGUAGE]
+            )
             return await self.async_step_voice()
 
         defaults = {**self._config_entry.data, **self._config_entry.options}

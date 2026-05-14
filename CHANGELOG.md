@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 - 2026-05-14
+
+- Added dropdown selectors for language, Azure region, and output format.
+- Filtered setup and options voice dropdowns by the selected language.
+- Expanded default language list beyond German and English.
+- Bumped integration version from `0.2.7` to `0.3.0`.
+
 ## 0.2.7 - 2026-05-14
 
 - Fixed Assist voice selection by returning Home Assistant `Voice` objects from `async_get_supported_voices`.

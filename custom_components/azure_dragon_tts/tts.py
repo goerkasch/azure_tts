@@ -45,12 +45,12 @@ from .const import (
     DEFAULT_RATE,
     DEFAULT_REGION,
     DEFAULT_VOICE,
+    SUPPORTED_LANGUAGES,
     USER_AGENT,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORT_LANGUAGES = ["de-DE", "en-US", "en-GB"]
 SUPPORT_OPTIONS = [CONF_VOICE, CONF_STYLE, CONF_RATE, CONF_PITCH, CONF_OUTPUT_FORMAT]
 OUTPUT_FORMAT_EXTENSIONS = {
     "mp3": "mp3",
@@ -116,7 +116,7 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
         self._rate = config.get(CONF_RATE, DEFAULT_RATE)
         self._pitch = config.get(CONF_PITCH, DEFAULT_PITCH)
         self._voices: list[dict[str, Any]] = []
-        self._languages = SUPPORT_LANGUAGES
+        self._languages = SUPPORTED_LANGUAGES
         self._attr_unique_id = f"azure_dragon_tts_{self._region}_{self._voice}"
         self._attr_name = self._name
 

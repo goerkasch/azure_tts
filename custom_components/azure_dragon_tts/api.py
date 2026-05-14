@@ -49,9 +49,12 @@ async def async_get_voices(
     return [voice for voice in voices if isinstance(voice, dict) and voice.get("ShortName")]
 
 
-def voice_options(voices: list[dict[str, Any]], fallback_voice: str) -> dict[str, str]:
+def voice_options(
+    voices: list[dict[str, Any]], fallback_voice: str, language: str | None = None
+) -> dict[str, str]:
     """Build Home Assistant dropdown options from Azure voice metadata."""
     options: dict[str, str] = {}
+    language = (language or "").lower()
     for voice in sorted(
         voices,
         key=lambda item: (
@@ -59,8 +62,11 @@ def voice_options(voices: list[dict[str, Any]], fallback_voice: str) -> dict[str
             str(item.get("LocalName") or item.get("DisplayName") or item["ShortName"]),
         ),
     ):
-        short_name = str(voice["ShortName"])
         locale = str(voice.get("Locale", ""))
+        if language and locale.lower() != language:
+            continue
+
+        short_name = str(voice["ShortName"])
         local_name = str(voice.get("LocalName") or voice.get("DisplayName") or short_name)
         gender = str(voice.get("Gender", ""))
 
@@ -73,5 +79,9 @@ def voice_options(voices: list[dict[str, Any]], fallback_voice: str) -> dict[str
             label_parts.append(local_name)
         options[short_name] = " - ".join(label_parts)
 
-    options.setdefault(fallback_voice, fallback_voice)
+    if fallback_voice and (not language or fallback_voice.lower().startswith(language)):
+        options.setdefault(fallback_voice, fallback_voice)
+
+    if not options:
+        options[fallback_voice] = fallback_voice
     return options
