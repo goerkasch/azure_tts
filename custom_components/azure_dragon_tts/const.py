@@ -9,6 +9,7 @@ DEFAULT_VOICE = "de-DE-Seraphina:DragonHDLatestNeural"
 DEFAULT_OUTPUT_FORMAT = "audio-24khz-48kbitrate-mono-mp3"
 DEFAULT_RATE = "0%"
 DEFAULT_PITCH = "0%"
+USER_AGENT = "home-assistant-azure-dragon-tts"
 
 CONF_REGION = "region"
 CONF_VOICE = "voice"

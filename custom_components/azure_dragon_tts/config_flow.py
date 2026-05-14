@@ -27,6 +27,9 @@ from .const import (
     DOMAIN,
 )
 
+_REQUIRED_STRING = vol.All(cv.string, vol.Strip, vol.Length(min=1))
+_OPTIONAL_STRING = vol.All(cv.string, vol.Strip)
+
 
 def _schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
     """Build a schema with optional defaults."""
@@ -35,30 +38,30 @@ def _schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
         {
             vol.Required(
                 CONF_API_KEY, default=defaults.get(CONF_API_KEY, "")
-            ): cv.string,
+            ): _REQUIRED_STRING,
             vol.Optional(
                 CONF_NAME, default=defaults.get(CONF_NAME, DEFAULT_NAME)
-            ): cv.string,
+            ): _REQUIRED_STRING,
             vol.Optional(
                 CONF_LANGUAGE, default=defaults.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
-            ): cv.string,
+            ): _REQUIRED_STRING,
             vol.Optional(
                 CONF_REGION, default=defaults.get(CONF_REGION, DEFAULT_REGION)
-            ): cv.string,
+            ): _REQUIRED_STRING,
             vol.Optional(
                 CONF_VOICE, default=defaults.get(CONF_VOICE, DEFAULT_VOICE)
-            ): cv.string,
+            ): _REQUIRED_STRING,
             vol.Optional(
                 CONF_OUTPUT_FORMAT,
                 default=defaults.get(CONF_OUTPUT_FORMAT, DEFAULT_OUTPUT_FORMAT),
-            ): cv.string,
-            vol.Optional(CONF_STYLE, default=defaults.get(CONF_STYLE, "")): cv.string,
+            ): _REQUIRED_STRING,
+            vol.Optional(CONF_STYLE, default=defaults.get(CONF_STYLE, "")): _OPTIONAL_STRING,
             vol.Optional(
                 CONF_RATE, default=defaults.get(CONF_RATE, DEFAULT_RATE)
-            ): cv.string,
+            ): _REQUIRED_STRING,
             vol.Optional(
                 CONF_PITCH, default=defaults.get(CONF_PITCH, DEFAULT_PITCH)
-            ): cv.string,
+            ): _REQUIRED_STRING,
         }
     )
 

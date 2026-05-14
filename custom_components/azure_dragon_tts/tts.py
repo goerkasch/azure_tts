@@ -7,6 +7,7 @@ import logging
 from typing import Any
 from xml.sax.saxutils import escape
 
+from aiohttp import ClientError
 import voluptuous as vol
 
 from homeassistant.components.tts import PLATFORM_SCHEMA, TextToSpeechEntity
@@ -20,6 +21,7 @@ except ImportError:  # Older HA versions
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY, CONF_LANGUAGE, CONF_NAME
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 
@@ -37,24 +39,36 @@ from .const import (
     DEFAULT_RATE,
     DEFAULT_REGION,
     DEFAULT_VOICE,
+    USER_AGENT,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 SUPPORT_LANGUAGES = ["de-DE", "en-US", "en-GB"]
 SUPPORT_OPTIONS = [CONF_VOICE, CONF_STYLE, CONF_RATE, CONF_PITCH, CONF_OUTPUT_FORMAT]
+OUTPUT_FORMAT_EXTENSIONS = {
+    "mp3": "mp3",
+    "opus": "opus",
+    "webm": "webm",
+    "ogg": "ogg",
+    "riff": "wav",
+    "wav": "wav",
+}
+
+_REQUIRED_STRING = vol.All(cv.string, vol.Strip, vol.Length(min=1))
+_OPTIONAL_STRING = vol.All(cv.string, vol.Strip)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.Required(CONF_API_KEY): cv.string,
-        vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-        vol.Optional(CONF_LANGUAGE, default=DEFAULT_LANGUAGE): cv.string,
-        vol.Optional(CONF_REGION, default=DEFAULT_REGION): cv.string,
-        vol.Optional(CONF_VOICE, default=DEFAULT_VOICE): cv.string,
-        vol.Optional(CONF_OUTPUT_FORMAT, default=DEFAULT_OUTPUT_FORMAT): cv.string,
-        vol.Optional(CONF_STYLE): cv.string,
-        vol.Optional(CONF_RATE, default=DEFAULT_RATE): cv.string,
-        vol.Optional(CONF_PITCH, default=DEFAULT_PITCH): cv.string,
+        vol.Required(CONF_API_KEY): _REQUIRED_STRING,
+        vol.Optional(CONF_NAME, default=DEFAULT_NAME): _REQUIRED_STRING,
+        vol.Optional(CONF_LANGUAGE, default=DEFAULT_LANGUAGE): _REQUIRED_STRING,
+        vol.Optional(CONF_REGION, default=DEFAULT_REGION): _REQUIRED_STRING,
+        vol.Optional(CONF_VOICE, default=DEFAULT_VOICE): _REQUIRED_STRING,
+        vol.Optional(CONF_OUTPUT_FORMAT, default=DEFAULT_OUTPUT_FORMAT): _REQUIRED_STRING,
+        vol.Optional(CONF_STYLE): _OPTIONAL_STRING,
+        vol.Optional(CONF_RATE, default=DEFAULT_RATE): _REQUIRED_STRING,
+        vol.Optional(CONF_PITCH, default=DEFAULT_PITCH): _REQUIRED_STRING,
     }
 )
 
@@ -88,7 +102,7 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
         self._region = config.get(CONF_REGION, DEFAULT_REGION)
         self._voice = config.get(CONF_VOICE, DEFAULT_VOICE)
         self._output_format = config.get(CONF_OUTPUT_FORMAT, DEFAULT_OUTPUT_FORMAT)
-        self._style = config.get(CONF_STYLE)
+        self._style = config.get(CONF_STYLE) or None
         self._rate = config.get(CONF_RATE, DEFAULT_RATE)
         self._pitch = config.get(CONF_PITCH, DEFAULT_PITCH)
         self._attr_unique_id = f"azure_dragon_tts_{self._region}_{self._voice}"
@@ -139,8 +153,10 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
         self, message: str, language: str, options: dict[str, Any]
     ):
         """Generate TTS audio bytes via Azure Speech REST API."""
-        audio = await self._synthesize(message, language or self._language, options or {})
-        return ("mp3", audio)
+        options = options or {}
+        output_format = options.get(CONF_OUTPUT_FORMAT, self._output_format)
+        audio = await self._synthesize(message, language or self._language, options)
+        return (_audio_extension(output_format), audio)
 
     async def async_stream_tts_audio(self, request: TTSAudioRequest):
         """Generate TTS audio for modern HA voice pipelines."""
@@ -151,14 +167,14 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
         async for chunk in request.message_gen:
             parts.append(chunk)
 
-        audio = await self._synthesize(
-            "".join(parts), request.language or self._language, request.options or {}
-        )
+        options = request.options or {}
+        output_format = options.get(CONF_OUTPUT_FORMAT, self._output_format)
+        audio = await self._synthesize("".join(parts), request.language or self._language, options)
 
         async def audio_gen() -> AsyncGenerator[bytes, None]:
             yield audio
 
-        return TTSAudioResponse(extension="mp3", data_gen=audio_gen())
+        return TTSAudioResponse(extension=_audio_extension(output_format), data_gen=audio_gen())
 
     async def _synthesize(self, message: str, language: str, options: dict[str, Any]) -> bytes:
         """Send SSML to Azure and return audio bytes."""
@@ -168,23 +184,36 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
         rate = options.get(CONF_RATE, self._rate)
         pitch = options.get(CONF_PITCH, self._pitch)
 
+        message = message.strip()
+        if not message:
+            raise HomeAssistantError("Azure TTS received an empty message")
+
         ssml = self._build_ssml(message, language, voice, style, rate, pitch)
         url = f"https://{self._region}.tts.speech.microsoft.com/cognitiveservices/v1"
         headers = {
             "Ocp-Apim-Subscription-Key": self._api_key,
             "Content-Type": "application/ssml+xml; charset=utf-8",
             "X-Microsoft-OutputFormat": output_format,
-            "User-Agent": "home-assistant-azure-dragon-tts",
+            "User-Agent": USER_AGENT,
         }
 
         session = async_get_clientsession(self.hass)
-        async with session.post(url, data=ssml.encode("utf-8"), headers=headers) as response:
-            body = await response.read()
-            if response.status != 200:
-                text = body.decode("utf-8", errors="ignore")
-                _LOGGER.error("Azure TTS failed: HTTP %s: %s", response.status, text)
-                raise RuntimeError(f"Azure TTS failed: HTTP {response.status}: {text}")
-            return body
+        try:
+            async with session.post(
+                url, data=ssml.encode("utf-8"), headers=headers
+            ) as response:
+                body = await response.read()
+                if response.status != 200:
+                    text = body.decode("utf-8", errors="ignore").strip()
+                    _LOGGER.error("Azure TTS failed: HTTP %s: %s", response.status, text)
+                    raise HomeAssistantError(
+                        f"Azure TTS failed with HTTP {response.status}: {text}"
+                    )
+                if not body:
+                    raise HomeAssistantError("Azure TTS returned an empty audio response")
+                return body
+        except ClientError as err:
+            raise HomeAssistantError(f"Could not connect to Azure TTS: {err}") from err
 
     @staticmethod
     def _build_ssml(
@@ -217,3 +246,12 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
             "</voice>"
             "</speak>"
         )
+
+
+def _audio_extension(output_format: str) -> str:
+    """Return the Home Assistant audio extension for an Azure output format."""
+    output_format = output_format.lower()
+    for marker, extension in OUTPUT_FORMAT_EXTENSIONS.items():
+        if marker in output_format:
+            return extension
+    return "mp3"
