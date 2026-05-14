@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.5 - 2026-05-14
+
+- Changed the voice dropdown to a plain list of Azure voice short names for maximum Home Assistant frontend compatibility.
+- Bumped integration version from `0.2.4` to `0.2.5`.
+
 ## 0.2.4 - 2026-05-14
 
 - Added local HACS brand asset at `custom_components/azure_dragon_tts/brand/icon.png`.

@@ -67,9 +67,7 @@ def _base_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
 
 def _voice_schema(options: dict[str, str], default_voice: str) -> vol.Schema:
     """Build a voice selection schema."""
-    select_options = [
-        {"value": value, "label": label or value} for value, label in options.items()
-    ]
+    select_options = sorted(options)
     return vol.Schema(
         {
             vol.Required(CONF_VOICE, default=default_voice): selector(
@@ -77,7 +75,6 @@ def _voice_schema(options: dict[str, str], default_voice: str) -> vol.Schema:
                     "select": {
                         "options": select_options,
                         "mode": "dropdown",
-                        "sort": True,
                     }
                 }
             ),
