@@ -11,7 +11,7 @@ from homeassistant.const import CONF_API_KEY, CONF_LANGUAGE, CONF_NAME
 from homeassistant.helpers.selector import selector
 import homeassistant.helpers.config_validation as cv
 
-from .api import AzureTtsError, async_get_voices, style_options, voice_options
+from .api import AzureTtsError, async_get_voices, voice_options
 from .const import (
     CONF_OUTPUT_FORMAT,
     CONF_PITCH,
@@ -31,6 +31,7 @@ from .const import (
     SUPPORTED_LANGUAGES,
     SUPPORTED_OUTPUT_FORMATS,
     SUPPORTED_REGIONS,
+    SUPPORTED_STYLES,
 )
 
 _REQUIRED_STRING = vol.All(cv.string, vol.Strip, vol.Length(min=1))
@@ -57,6 +58,9 @@ def _base_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
                 CONF_OUTPUT_FORMAT,
                 default=defaults.get(CONF_OUTPUT_FORMAT, DEFAULT_OUTPUT_FORMAT),
             ): _select(SUPPORTED_OUTPUT_FORMATS, defaults.get(CONF_OUTPUT_FORMAT)),
+            vol.Optional(
+                CONF_STYLE, default=defaults.get(CONF_STYLE, DEFAULT_STYLE)
+            ): _select(SUPPORTED_STYLES, defaults.get(CONF_STYLE)),
             vol.Optional(
                 CONF_RATE, default=defaults.get(CONF_RATE, DEFAULT_RATE)
             ): _REQUIRED_STRING,
@@ -94,16 +98,6 @@ def _voice_schema(options: dict[str, str], default_voice: str) -> vol.Schema:
     )
 
 
-def _style_schema(options: list[str], default_style: str | None = None) -> vol.Schema:
-    """Build a style selection schema."""
-    default_style = _default_option(options, default_style or DEFAULT_STYLE, DEFAULT_STYLE)
-    return vol.Schema(
-        {
-            vol.Required(CONF_STYLE, default=default_style): _select(options),
-        }
-    )
-
-
 def _default_option(options: list[str], preferred: str, fallback: str) -> str:
     """Return a valid default for a dropdown."""
     if not options:
@@ -130,7 +124,6 @@ class AzureDragonTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     _config: dict[str, Any]
     _voices: list[dict[str, Any]]
     _voice_options: dict[str, str]
-    _style_options: list[str]
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -161,22 +154,6 @@ class AzureDragonTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> config_entries.ConfigFlowResult:
         """Handle voice selection."""
         if user_input is not None:
-            self._config = {**self._config, **_clean_input(user_input)}
-            self._style_options = style_options(
-                self._voices, self._config[CONF_VOICE], self._config.get(CONF_STYLE)
-            )
-            return await self.async_step_style()
-
-        return self.async_show_form(
-            step_id="voice",
-            data_schema=_voice_schema(self._voice_options, DEFAULT_VOICE),
-        )
-
-    async def async_step_style(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Handle style selection."""
-        if user_input is not None:
             cleaned = {**self._config, **_clean_input(user_input)}
             await self.async_set_unique_id(
                 f"{cleaned[CONF_REGION]}_{cleaned[CONF_VOICE]}"
@@ -187,8 +164,8 @@ class AzureDragonTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
 
         return self.async_show_form(
-            step_id="style",
-            data_schema=_style_schema(self._style_options, self._config.get(CONF_STYLE)),
+            step_id="voice",
+            data_schema=_voice_schema(self._voice_options, DEFAULT_VOICE),
         )
 
     @staticmethod
@@ -207,7 +184,6 @@ class AzureDragonTtsOptionsFlow(config_entries.OptionsFlow):
         self._config: dict[str, Any] = {}
         self._voices: list[dict[str, Any]] = []
         self._voice_options: dict[str, str] = {}
-        self._style_options: list[str] = []
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -242,14 +218,9 @@ class AzureDragonTtsOptionsFlow(config_entries.OptionsFlow):
     ) -> config_entries.ConfigFlowResult:
         """Manage Azure Dragon TTS voice selection."""
         if user_input is not None:
-            self._config = {**self._config, **_clean_input(user_input)}
-            current_style = self._config_entry.options.get(
-                CONF_STYLE, self._config_entry.data.get(CONF_STYLE, DEFAULT_STYLE)
+            return self.async_create_entry(
+                title="", data={**self._config, **_clean_input(user_input)}
             )
-            self._style_options = style_options(
-                self._voices, self._config[CONF_VOICE], current_style
-            )
-            return await self.async_step_style()
 
         default_voice = self._config_entry.options.get(
             CONF_VOICE, self._config_entry.data.get(CONF_VOICE, DEFAULT_VOICE)
@@ -257,21 +228,4 @@ class AzureDragonTtsOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="voice",
             data_schema=_voice_schema(self._voice_options, default_voice),
-        )
-
-    async def async_step_style(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Manage Azure Dragon TTS style selection."""
-        if user_input is not None:
-            return self.async_create_entry(
-                title="", data={**self._config, **_clean_input(user_input)}
-            )
-
-        current_style = self._config_entry.options.get(
-            CONF_STYLE, self._config_entry.data.get(CONF_STYLE, DEFAULT_STYLE)
-        )
-        return self.async_show_form(
-            step_id="style",
-            data_schema=_style_schema(self._style_options, current_style),
         )

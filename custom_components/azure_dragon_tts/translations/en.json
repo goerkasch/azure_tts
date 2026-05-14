@@ -24,13 +24,6 @@
         "data": {
           "voice": "Voice"
         }
-      },
-      "style": {
-        "title": "Azure Dragon TTS style",
-        "description": "Choose a style supported by the selected Azure voice.",
-        "data": {
-          "style": "Style"
-        }
       }
     }
   },
@@ -56,12 +49,6 @@
         "title": "Azure Dragon TTS voice",
         "data": {
           "voice": "Voice"
-        }
-      },
-      "style": {
-        "title": "Azure Dragon TTS style",
-        "data": {
-          "style": "Style"
         }
       }
     }

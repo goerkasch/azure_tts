@@ -1,12 +1,12 @@
 {
   "config": {
     "error": {
-      "cannot_connect": "Azure-Stimmen konnten nicht geladen werden. Pruefe Speech-Schluessel und Region."
+      "cannot_connect": "Azure-Stimmen konnten nicht geladen werden. Pruefe den Speech-Schluessel und die Region."
     },
     "step": {
       "user": {
         "title": "Azure Dragon TTS",
-        "description": "Azure Speech Text-to-Speech einrichten.",
+        "description": "Azure Speech Text-to-Speech einrichten. Stilwerte bleiben auf Englisch, weil Azure diese technischen Werte erwartet.",
         "data": {
           "api_key": "Azure Speech-Schluessel",
           "name": "Name",
@@ -24,19 +24,12 @@
         "data": {
           "voice": "Stimme"
         }
-      },
-      "style": {
-        "title": "Azure Dragon TTS Stil",
-        "description": "Waehle einen Stil, der von der ausgewaehlten Azure-Stimme unterstuetzt wird.",
-        "data": {
-          "style": "Stil"
-        }
       }
     }
   },
   "options": {
     "error": {
-      "cannot_connect": "Azure-Stimmen konnten nicht geladen werden. Pruefe Speech-Schluessel und Region."
+      "cannot_connect": "Azure-Stimmen konnten nicht geladen werden. Pruefe den Speech-Schluessel und die Region."
     },
     "step": {
       "init": {
@@ -56,12 +49,6 @@
         "title": "Azure Dragon TTS Stimme",
         "data": {
           "voice": "Stimme"
-        }
-      },
-      "style": {
-        "title": "Azure Dragon TTS Stil",
-        "data": {
-          "style": "Stil"
         }
       }
     }

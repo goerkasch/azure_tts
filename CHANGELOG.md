@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.2 - 2026-05-14
+
+- Replaced dynamic style loading with one fixed full style dropdown list.
+- Moved style selection back into the main setup and options form.
+- Bumped integration version from `0.4.1` to `0.4.2`.
+
+## 0.4.1 - 2026-05-14
+
+- Added fallback styles when Azure voice metadata does not include a `StyleList`.
+- Read style metadata from several possible Azure voice-list field names.
+- Bumped integration version from `0.4.0` to `0.4.1`.
+
 ## 0.4.0 - 2026-05-14
 
 - Added dynamic style loading from Azure voice metadata.
