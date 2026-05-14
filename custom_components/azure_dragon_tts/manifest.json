@@ -8,6 +8,7 @@
   "documentation": "https://learn.microsoft.com/azure/ai-services/speech-service/text-to-speech",
   "integration_type": "service",
   "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/goerkasch/azure_tts/issues",
   "requirements": [],
-  "version": "0.1.1"
+  "version": "0.1.2"
 }

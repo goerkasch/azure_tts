@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2 - 2026-05-14
+
+- Added root `hacs.json` metadata for HACS.
+- Added `issue_tracker` to the Home Assistant integration manifest.
+- Bumped integration version from `0.1.1` to `0.1.2`.
+
 ## 0.1.1 - 2026-05-14
 
 - Added `pyproject.toml` with project metadata and lint configuration.

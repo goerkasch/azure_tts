@@ -16,6 +16,16 @@ Restart Home Assistant, then add the integration from:
 Settings > Devices & services > Add integration > Azure Dragon TTS
 ```
 
+## HACS
+
+If you install this repository as a HACS custom repository, add it as type `Integration`:
+
+```text
+https://github.com/goerkasch/azure_tts
+```
+
+For updates, use GitHub releases such as `v0.1.2`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
+
 ## Configuration
 
 Required:
@@ -48,3 +58,27 @@ tts:
 ```
 
 After setup, Home Assistant creates a TTS entity that can be used by the regular TTS speak action and Assist pipelines.
+
+## Troubleshooting
+
+### `Secret azure_speech_key not defined`
+
+If you use the YAML example with:
+
+```yaml
+api_key: !secret azure_speech_key
+```
+
+Home Assistant expects this entry in your `secrets.yaml` file:
+
+```yaml
+azure_speech_key: your_azure_speech_key_here
+```
+
+Make sure `secrets.yaml` is in the same config directory as `configuration.yaml`, then restart Home Assistant or reload YAML.
+
+You can also avoid YAML secrets entirely by adding the integration through the UI:
+
+```text
+Settings > Devices & services > Add integration > Azure Dragon TTS
+```
