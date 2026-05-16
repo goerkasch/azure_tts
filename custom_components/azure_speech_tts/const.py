@@ -1,16 +1,16 @@
-"""Constants for the Azure Dragon TTS integration."""
+"""Constants for the Azure Speech TTS integration."""
 
-DOMAIN = "azure_dragon_tts"
+DOMAIN = "azure_speech_tts"
 
 DEFAULT_LANGUAGE = "de-DE"
-DEFAULT_NAME = "Azure Dragon TTS"
+DEFAULT_NAME = "Azure Speech TTS"
 DEFAULT_REGION = "westeurope"
 DEFAULT_VOICE = "de-DE-Seraphina:DragonHDLatestNeural"
 DEFAULT_OUTPUT_FORMAT = "audio-24khz-48kbitrate-mono-mp3"
 DEFAULT_STYLE = "none"
 DEFAULT_RATE = "0%"
 DEFAULT_PITCH = "0%"
-USER_AGENT = "home-assistant-azure-dragon-tts"
+USER_AGENT = "home-assistant-azure-speech-tts"
 
 SUPPORTED_LANGUAGES = [
     "de-DE",

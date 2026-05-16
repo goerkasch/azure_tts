@@ -1,4 +1,4 @@
-"""Config flow for Azure Dragon TTS."""
+"""Config flow for Azure Speech TTS."""
 
 from __future__ import annotations
 
@@ -117,8 +117,8 @@ def _clean_input(user_input: dict[str, Any]) -> dict[str, Any]:
     return cleaned
 
 
-class AzureDragonTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle an Azure Dragon TTS config flow."""
+class AzureSpeechTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle an Azure Speech TTS config flow."""
 
     VERSION = 1
     _config: dict[str, Any]
@@ -171,13 +171,13 @@ class AzureDragonTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
-    ) -> AzureDragonTtsOptionsFlow:
+    ) -> AzureSpeechTtsOptionsFlow:
         """Create the options flow."""
-        return AzureDragonTtsOptionsFlow(config_entry)
+        return AzureSpeechTtsOptionsFlow(config_entry)
 
 
-class AzureDragonTtsOptionsFlow(config_entries.OptionsFlow):
-    """Handle Azure Dragon TTS options."""
+class AzureSpeechTtsOptionsFlow(config_entries.OptionsFlow):
+    """Handle Azure Speech TTS options."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         self._config_entry = config_entry
@@ -188,7 +188,7 @@ class AzureDragonTtsOptionsFlow(config_entries.OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Manage Azure Dragon TTS options."""
+        """Manage Azure Speech TTS options."""
         if user_input is not None:
             self._config = _clean_input(user_input)
             try:
@@ -216,7 +216,7 @@ class AzureDragonTtsOptionsFlow(config_entries.OptionsFlow):
     async def async_step_voice(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Manage Azure Dragon TTS voice selection."""
+        """Manage Azure Speech TTS voice selection."""
         if user_input is not None:
             return self.async_create_entry(
                 title="", data={**self._config, **_clean_input(user_input)}

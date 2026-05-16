@@ -5,7 +5,7 @@
     },
     "step": {
       "user": {
-        "title": "Azure Dragon TTS",
+        "title": "Azure Speech TTS",
         "description": "Azure Speech Text-to-Speech einrichten. Stilwerte bleiben auf Englisch, weil Azure diese technischen Werte erwartet.",
         "data": {
           "api_key": "Azure Speech-Schluessel",
@@ -19,7 +19,7 @@
         }
       },
       "voice": {
-        "title": "Azure Dragon TTS Stimme",
+        "title": "Azure Speech TTS Stimme",
         "description": "Waehle eine der Stimmen, die fuer deine Azure Speech-Ressource verfuegbar sind.",
         "data": {
           "voice": "Stimme"
@@ -33,7 +33,7 @@
     },
     "step": {
       "init": {
-        "title": "Azure Dragon TTS Optionen",
+        "title": "Azure Speech TTS Optionen",
         "data": {
           "api_key": "Azure Speech-Schluessel",
           "name": "Name",
@@ -46,7 +46,7 @@
         }
       },
       "voice": {
-        "title": "Azure Dragon TTS Stimme",
+        "title": "Azure Speech TTS Stimme",
         "data": {
           "voice": "Stimme"
         }
