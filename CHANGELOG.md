@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.1 - 2026-05-16
+
+- Added missing Azure Neural, Dragon HD Flash, and MAI-style speaking styles to
+  the fixed style dropdown.
+- Grouped documented speaking styles in code and README by Azure voice family.
+- Added a style-group step to the setup and options flows so the Home Assistant
+  UI shows a filtered style dropdown.
+- Bumped integration version from `0.5.0` to `0.5.1`.
+
 ## 0.5.0 - 2026-05-16
 
 - Renamed the integration from Azure Dragon TTS to Azure Speech TTS, including

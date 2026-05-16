@@ -13,7 +13,6 @@
           "language": "Language",
           "region": "Azure region",
           "output_format": "Output format",
-          "style": "Style",
           "rate": "Rate",
           "pitch": "Pitch"
         }
@@ -23,6 +22,20 @@
         "description": "Choose one of the voices available for your Azure Speech resource.",
         "data": {
           "voice": "Voice"
+        }
+      },
+      "style_group": {
+        "title": "Azure Speech TTS style group",
+        "description": "Choose a style group to filter the next style list.",
+        "data": {
+          "style_group": "Style group"
+        }
+      },
+      "style": {
+        "title": "Azure Speech TTS style",
+        "description": "Choose a style from the selected group. Not every voice supports every style.",
+        "data": {
+          "style": "Style"
         }
       }
     }
@@ -40,7 +53,6 @@
           "language": "Language",
           "region": "Azure region",
           "output_format": "Output format",
-          "style": "Style",
           "rate": "Rate",
           "pitch": "Pitch"
         }
@@ -49,6 +61,18 @@
         "title": "Azure Speech TTS voice",
         "data": {
           "voice": "Voice"
+        }
+      },
+      "style_group": {
+        "title": "Azure Speech TTS style group",
+        "data": {
+          "style_group": "Style group"
+        }
+      },
+      "style": {
+        "title": "Azure Speech TTS style",
+        "data": {
+          "style": "Style"
         }
       }
     }

@@ -18,6 +18,7 @@ from .const import (
     CONF_RATE,
     CONF_REGION,
     CONF_STYLE,
+    CONF_STYLE_GROUP,
     CONF_VOICE,
     DEFAULT_LANGUAGE,
     DEFAULT_NAME,
@@ -26,12 +27,14 @@ from .const import (
     DEFAULT_RATE,
     DEFAULT_REGION,
     DEFAULT_STYLE,
+    DEFAULT_STYLE_GROUP,
     DEFAULT_VOICE,
     DOMAIN,
+    STYLE_GROUP_STYLES,
     SUPPORTED_LANGUAGES,
     SUPPORTED_OUTPUT_FORMATS,
     SUPPORTED_REGIONS,
-    SUPPORTED_STYLES,
+    SUPPORTED_STYLE_GROUPS,
 )
 
 _REQUIRED_STRING = vol.All(cv.string, vol.Strip, vol.Length(min=1))
@@ -59,14 +62,43 @@ def _base_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
                 default=defaults.get(CONF_OUTPUT_FORMAT, DEFAULT_OUTPUT_FORMAT),
             ): _select(SUPPORTED_OUTPUT_FORMATS, defaults.get(CONF_OUTPUT_FORMAT)),
             vol.Optional(
-                CONF_STYLE, default=defaults.get(CONF_STYLE, DEFAULT_STYLE)
-            ): _select(SUPPORTED_STYLES, defaults.get(CONF_STYLE)),
-            vol.Optional(
                 CONF_RATE, default=defaults.get(CONF_RATE, DEFAULT_RATE)
             ): _REQUIRED_STRING,
             vol.Optional(
                 CONF_PITCH, default=defaults.get(CONF_PITCH, DEFAULT_PITCH)
             ): _REQUIRED_STRING,
+        }
+    )
+
+
+def _style_group_schema(defaults: dict[str, Any] | None = None) -> vol.Schema:
+    """Build the schema for selecting a style family."""
+    defaults = defaults or {}
+    default_group = defaults.get(CONF_STYLE_GROUP) or _style_group_for_style(
+        defaults.get(CONF_STYLE, DEFAULT_STYLE)
+    )
+    return vol.Schema(
+        {
+            vol.Required(
+                CONF_STYLE_GROUP, default=default_group
+            ): _select(SUPPORTED_STYLE_GROUPS, default_group),
+        }
+    )
+
+
+def _style_schema(
+    style_group: str, defaults: dict[str, Any] | None = None
+) -> vol.Schema:
+    """Build the schema for selecting a style from a family."""
+    defaults = defaults or {}
+    styles = [DEFAULT_STYLE, *STYLE_GROUP_STYLES.get(style_group, [])]
+    current_style = defaults.get(CONF_STYLE, DEFAULT_STYLE)
+    default_style = _default_option(styles, current_style, DEFAULT_STYLE)
+    return vol.Schema(
+        {
+            vol.Required(CONF_STYLE, default=default_style): _select(
+                styles, current_style
+            ),
         }
     )
 
@@ -117,6 +149,16 @@ def _clean_input(user_input: dict[str, Any]) -> dict[str, Any]:
     return cleaned
 
 
+def _style_group_for_style(style: str | None) -> str:
+    """Return the first style family that contains a style."""
+    if not style or style == DEFAULT_STYLE:
+        return DEFAULT_STYLE_GROUP
+    for style_group, styles in STYLE_GROUP_STYLES.items():
+        if style in styles:
+            return style_group
+    return DEFAULT_STYLE_GROUP
+
+
 class AzureSpeechTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle an Azure Speech TTS config flow."""
 
@@ -154,18 +196,46 @@ class AzureSpeechTtsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> config_entries.ConfigFlowResult:
         """Handle voice selection."""
         if user_input is not None:
-            cleaned = {**self._config, **_clean_input(user_input)}
+            self._config = {**self._config, **_clean_input(user_input)}
             await self.async_set_unique_id(
-                f"{cleaned[CONF_REGION]}_{cleaned[CONF_VOICE]}"
+                f"{self._config[CONF_REGION]}_{self._config[CONF_VOICE]}"
             )
             self._abort_if_unique_id_configured()
+            return await self.async_step_style_group()
+
+        return self.async_show_form(
+            step_id="voice",
+            data_schema=_voice_schema(self._voice_options, DEFAULT_VOICE),
+        )
+
+    async def async_step_style_group(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Handle style family selection."""
+        if user_input is not None:
+            self._config = {**self._config, **_clean_input(user_input)}
+            return await self.async_step_style()
+
+        return self.async_show_form(
+            step_id="style_group",
+            data_schema=_style_group_schema(self._config),
+        )
+
+    async def async_step_style(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Handle filtered style selection."""
+        if user_input is not None:
+            cleaned = {**self._config, **_clean_input(user_input)}
             return self.async_create_entry(
                 title=cleaned.get(CONF_NAME, DEFAULT_NAME), data=cleaned
             )
 
         return self.async_show_form(
-            step_id="voice",
-            data_schema=_voice_schema(self._voice_options, DEFAULT_VOICE),
+            step_id="style",
+            data_schema=_style_schema(
+                self._config.get(CONF_STYLE_GROUP, DEFAULT_STYLE_GROUP), self._config
+            ),
         )
 
     @staticmethod
@@ -218,9 +288,8 @@ class AzureSpeechTtsOptionsFlow(config_entries.OptionsFlow):
     ) -> config_entries.ConfigFlowResult:
         """Manage Azure Speech TTS voice selection."""
         if user_input is not None:
-            return self.async_create_entry(
-                title="", data={**self._config, **_clean_input(user_input)}
-            )
+            self._config = {**self._config, **_clean_input(user_input)}
+            return await self.async_step_style_group()
 
         default_voice = self._config_entry.options.get(
             CONF_VOICE, self._config_entry.data.get(CONF_VOICE, DEFAULT_VOICE)
@@ -228,4 +297,43 @@ class AzureSpeechTtsOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="voice",
             data_schema=_voice_schema(self._voice_options, default_voice),
+        )
+
+    async def async_step_style_group(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Manage Azure Speech TTS style family selection."""
+        if user_input is not None:
+            self._config = {**self._config, **_clean_input(user_input)}
+            return await self.async_step_style()
+
+        defaults = {
+            **self._config_entry.data,
+            **self._config_entry.options,
+            **self._config,
+        }
+        return self.async_show_form(
+            step_id="style_group",
+            data_schema=_style_group_schema(defaults),
+        )
+
+    async def async_step_style(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Manage Azure Speech TTS filtered style selection."""
+        if user_input is not None:
+            return self.async_create_entry(
+                title="", data={**self._config, **_clean_input(user_input)}
+            )
+
+        defaults = {
+            **self._config_entry.data,
+            **self._config_entry.options,
+            **self._config,
+        }
+        return self.async_show_form(
+            step_id="style",
+            data_schema=_style_schema(
+                self._config.get(CONF_STYLE_GROUP, DEFAULT_STYLE_GROUP), defaults
+            ),
         )

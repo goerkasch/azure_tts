@@ -13,7 +13,6 @@
           "language": "Sprache",
           "region": "Azure-Region",
           "output_format": "Ausgabeformat",
-          "style": "Stil",
           "rate": "Geschwindigkeit",
           "pitch": "Tonhoehe"
         }
@@ -23,6 +22,20 @@
         "description": "Waehle eine der Stimmen, die fuer deine Azure Speech-Ressource verfuegbar sind.",
         "data": {
           "voice": "Stimme"
+        }
+      },
+      "style_group": {
+        "title": "Azure Speech TTS Stilgruppe",
+        "description": "Waehle eine Stilgruppe, um die folgende Stilliste zu filtern.",
+        "data": {
+          "style_group": "Stilgruppe"
+        }
+      },
+      "style": {
+        "title": "Azure Speech TTS Stil",
+        "description": "Waehle einen Stil aus der gewaehlten Gruppe. Nicht jede Stimme unterstuetzt jeden Stil.",
+        "data": {
+          "style": "Stil"
         }
       }
     }
@@ -40,7 +53,6 @@
           "language": "Sprache",
           "region": "Azure-Region",
           "output_format": "Ausgabeformat",
-          "style": "Stil",
           "rate": "Geschwindigkeit",
           "pitch": "Tonhoehe"
         }
@@ -49,6 +61,18 @@
         "title": "Azure Speech TTS Stimme",
         "data": {
           "voice": "Stimme"
+        }
+      },
+      "style_group": {
+        "title": "Azure Speech TTS Stilgruppe",
+        "data": {
+          "style_group": "Stilgruppe"
+        }
+      },
+      "style": {
+        "title": "Azure Speech TTS Stil",
+        "data": {
+          "style": "Stil"
         }
       }
     }

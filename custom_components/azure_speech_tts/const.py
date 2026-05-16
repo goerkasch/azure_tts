@@ -8,6 +8,7 @@ DEFAULT_REGION = "westeurope"
 DEFAULT_VOICE = "de-DE-Seraphina:DragonHDLatestNeural"
 DEFAULT_OUTPUT_FORMAT = "audio-24khz-48kbitrate-mono-mp3"
 DEFAULT_STYLE = "none"
+DEFAULT_STYLE_GROUP = "Dragon HD / Dragon HD Omni styles"
 DEFAULT_RATE = "0%"
 DEFAULT_PITCH = "0%"
 USER_AGENT = "home-assistant-azure-speech-tts"
@@ -61,8 +62,36 @@ SUPPORTED_OUTPUT_FORMATS = [
     "riff-48khz-16bit-mono-pcm",
 ]
 
-SUPPORTED_STYLES = [
-    "none",
+AZURE_NEURAL_STYLES = [
+    "advertisement-upbeat",
+    "advertisement_upbeat",
+    "affectionate",
+    "assistant",
+    "chat",
+    "cheerful",
+    "customerservice",
+    "depressed",
+    "disgruntled",
+    "documentary-narration",
+    "embarrassed",
+    "empathetic",
+    "envious",
+    "friendly",
+    "gentle",
+    "hopeful",
+    "lyrical",
+    "narration-professional",
+    "narration-relaxed",
+    "newscast",
+    "newscast-casual",
+    "newscast-formal",
+    "poetry-reading",
+    "sports_commentary",
+    "sports_commentary_excited",
+    "unfriendly",
+]
+
+DRAGON_HD_STYLES = [
     "amazed",
     "amused",
     "angry",
@@ -127,9 +156,74 @@ SUPPORTED_STYLES = [
     "whispering",
 ]
 
+DRAGON_HD_FLASH_STYLES = [
+    "assassin",
+    "captain",
+    "cavalier",
+    "complaining",
+    "comforting",
+    "customer-service",
+    "cute",
+    "debating",
+    "game-narrator",
+    "geomancer",
+    "guilty",
+    "live-commercial",
+    "lonely",
+    "nervous",
+    "news",
+    "poet",
+    "prince",
+    "sentimental",
+    "sorry",
+    "story",
+    "strict",
+    "tired",
+    "voice-assistant",
+]
+
+MAI_VOICE_STYLES = [
+    "anger",
+    "confusion",
+    "disgust",
+    "embarrassment",
+    "excitement",
+    "fear",
+    "generalconversation",
+    "happiness",
+    "hope",
+    "jealous",
+    "joy",
+    "learning",
+    "media",
+    "persuasive",
+    "regret",
+    "sadness",
+    "sales",
+    "surprise",
+]
+
+STYLE_GROUP_STYLES = {
+    "Azure Neural / scenario styles": AZURE_NEURAL_STYLES,
+    "Dragon HD / Dragon HD Omni styles": DRAGON_HD_STYLES,
+    "Dragon HD Flash styles": DRAGON_HD_FLASH_STYLES,
+    "MAI-Voice-1 preview styles": MAI_VOICE_STYLES,
+}
+
+SUPPORTED_STYLE_GROUPS = list(STYLE_GROUP_STYLES)
+
+SUPPORTED_STYLES = [
+    DEFAULT_STYLE,
+    *AZURE_NEURAL_STYLES,
+    *DRAGON_HD_STYLES,
+    *DRAGON_HD_FLASH_STYLES,
+    *MAI_VOICE_STYLES,
+]
+
 CONF_REGION = "region"
 CONF_VOICE = "voice"
 CONF_OUTPUT_FORMAT = "output_format"
 CONF_STYLE = "style"
+CONF_STYLE_GROUP = "style_group"
 CONF_RATE = "rate"
 CONF_PITCH = "pitch"

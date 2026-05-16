@@ -16,7 +16,7 @@ After installation, restart Home Assistant and add the integration from:
 Settings > Devices & services > Add integration > Azure Speech TTS
 ```
 
-For updates, use GitHub releases such as `v0.5.0`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
+For updates, use GitHub releases such as `v0.5.1`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
 
 ### Renaming from Azure Dragon TTS
 
@@ -74,7 +74,8 @@ The integration supports three optional voice tuning fields:
 - `rate`: Speaking speed. Use values such as `0%`, `+10%`, `-10%`, `+25%`, or `-25%`.
 - `pitch`: Speaking pitch. Use values such as `0%`, `+5%`, `-5%`, `+10%`, or `-10%`.
 
-In the UI, `style` is available as a dropdown. Choose `none` to disable Azure speaking styles.
+In the UI, choose a style group first, then select a filtered `style` from that
+group. Choose `none` to disable Azure speaking styles.
 
 Recommended stable defaults:
 
@@ -84,7 +85,9 @@ rate: 0%
 pitch: 0%
 ```
 
-Available style values:
+Available style values by Azure voice family:
+
+Dragon HD / Dragon HD Omni expressive styles:
 
 ```text
 amazed
@@ -149,6 +152,88 @@ terrified
 upset
 urgent
 whispering
+```
+
+Azure Neural / scenario styles:
+
+```text
+advertisement-upbeat
+advertisement_upbeat
+affectionate
+assistant
+chat
+cheerful
+customerservice
+depressed
+disgruntled
+documentary-narration
+embarrassed
+empathetic
+envious
+friendly
+gentle
+hopeful
+lyrical
+narration-professional
+narration-relaxed
+newscast
+newscast-casual
+newscast-formal
+poetry-reading
+sports_commentary
+sports_commentary_excited
+unfriendly
+```
+
+Dragon HD Flash styles:
+
+```text
+assassin
+captain
+cavalier
+complaining
+comforting
+customer-service
+cute
+debating
+game-narrator
+geomancer
+guilty
+live-commercial
+lonely
+nervous
+news
+poet
+prince
+sentimental
+sorry
+story
+strict
+tired
+voice-assistant
+```
+
+MAI-Voice-1 preview styles:
+
+```text
+anger
+confusion
+disgust
+embarrassment
+excitement
+fear
+generalconversation
+happiness
+hope
+jealous
+joy
+learning
+media
+persuasive
+regret
+sadness
+sales
+surprise
 ```
 
 Not every Azure voice supports every style. If Azure rejects a request, choose `none` first and test again. `rate` and `pitch` are applied with SSML prosody and are generally safer to adjust.
