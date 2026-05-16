@@ -1,6 +1,6 @@
 {
-  "domain": "azure_dragon_tts",
-  "name": "Azure Dragon TTS",
+  "domain": "azure_speech_tts",
+  "name": "Azure Speech TTS",
   "after_dependencies": ["tts"],
   "codeowners": ["@goerkasch"],
   "config_flow": true,

@@ -82,9 +82,9 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities
 ) -> None:
-    """Set up Azure Dragon TTS from a config entry."""
+    """Set up Azure Speech TTS from a config entry."""
     config = {**entry.data, **entry.options}
-    entity = AzureDragonTtsEntity(hass, config)
+    entity = AzureSpeechTtsEntity(hass, config)
     await entity.async_load_voices()
     async_add_entities([entity])
 
@@ -92,13 +92,13 @@ async def async_setup_entry(
 async def async_setup_platform(
     hass: HomeAssistant, config: dict[str, Any], async_add_entities, discovery_info=None
 ) -> None:
-    """Set up the Azure Dragon TTS platform from YAML."""
-    entity = AzureDragonTtsEntity(hass, config)
+    """Set up the Azure Speech TTS platform from YAML."""
+    entity = AzureSpeechTtsEntity(hass, config)
     await entity.async_load_voices()
     async_add_entities([entity])
 
 
-class AzureDragonTtsEntity(TextToSpeechEntity):
+class AzureSpeechTtsEntity(TextToSpeechEntity):
     """Azure Speech TTS entity that sends exact SSML to Azure."""
 
     _attr_should_poll = False
@@ -117,7 +117,7 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
         self._pitch = config.get(CONF_PITCH, DEFAULT_PITCH)
         self._voices: list[dict[str, Any]] = []
         self._languages = SUPPORTED_LANGUAGES
-        self._attr_unique_id = f"azure_dragon_tts_{self._region}_{self._voice}"
+        self._attr_unique_id = f"azure_speech_tts_{self._region}_{self._voice}"
         self._attr_name = self._name
 
     async def async_load_voices(self) -> None:

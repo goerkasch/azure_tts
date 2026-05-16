@@ -1,4 +1,4 @@
-# Azure Dragon TTS for Home Assistant
+# Azure Speech TTS for Home Assistant
 
 Custom integration to use Azure Speech text-to-speech voices, including direct SSML voice names such as `de-DE-Seraphina:DragonHDLatestNeural`, in Home Assistant.
 
@@ -13,23 +13,31 @@ https://github.com/goerkasch/azure_tts
 After installation, restart Home Assistant and add the integration from:
 
 ```text
-Settings > Devices & services > Add integration > Azure Dragon TTS
+Settings > Devices & services > Add integration > Azure Speech TTS
 ```
 
 For updates, use GitHub releases such as `v0.4.2`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
 
+### Renaming from Azure Dragon TTS
+
+The integration domain and folder were renamed from `azure_dragon_tts` to
+`azure_speech_tts`. When updating from an older manual installation, remove the old
+`custom_components/azure_dragon_tts` folder and install
+`custom_components/azure_speech_tts`. YAML users should change
+`platform: azure_dragon_tts` to `platform: azure_speech_tts`.
+
 ## Manual installation
 
-Copy the folder `custom_components/azure_dragon_tts` into your Home Assistant config directory:
+Copy the folder `custom_components/azure_speech_tts` into your Home Assistant config directory:
 
 ```text
-<home-assistant-config>/custom_components/azure_dragon_tts
+<home-assistant-config>/custom_components/azure_speech_tts
 ```
 
 Restart Home Assistant, then add the integration from:
 
 ```text
-Settings > Devices & services > Add integration > Azure Dragon TTS
+Settings > Devices & services > Add integration > Azure Speech TTS
 ```
 
 ## Configuration
@@ -150,7 +158,7 @@ Not every Azure voice supports every style. If Azure rejects a request, choose `
 The integration exposes Azure voices to Home Assistant Assist. In your voice assistant settings, select:
 
 ```text
-Text-to-speech: Azure Dragon TTS
+Text-to-speech: Azure Speech TTS
 Language: your language, for example Deutsch (Deutschland)
 Voice: one of the Azure voices for that language
 ```
@@ -170,10 +178,10 @@ Example action:
 ```yaml
 action: tts.speak
 target:
-  entity_id: tts.azure_dragon_tts
+  entity_id: tts.azure_speech_tts
 data:
   media_player_entity_id: media_player.your_player
-  message: "Hallo, dies ist ein Test mit Azure Dragon TTS."
+  message: "Hallo, dies ist ein Test mit Azure Speech TTS."
   language: de-DE
 ```
 
@@ -205,7 +213,7 @@ The integration also keeps YAML platform setup available:
 
 ```yaml
 tts:
-  - platform: azure_dragon_tts
+  - platform: azure_speech_tts
     api_key: !secret azure_speech_key
     region: westeurope
     language: de-DE
@@ -238,12 +246,12 @@ Make sure `secrets.yaml` is in the same config directory as `configuration.yaml`
 You can also avoid YAML secrets entirely by adding the integration through the UI:
 
 ```text
-Settings > Devices & services > Add integration > Azure Dragon TTS
+Settings > Devices & services > Add integration > Azure Speech TTS
 ```
 
 ### HACS default repository preparation
 
-To prepare this repository for the HACS default repository list, keep the HACS and Hassfest GitHub Actions passing, publish a GitHub release for each version, and add the integration domain `azure_dragon_tts` to the Home Assistant Brands repository.
+To prepare this repository for the HACS default repository list, keep the HACS and Hassfest GitHub Actions passing, publish a GitHub release for each version, and add the integration domain `azure_speech_tts` to the Home Assistant Brands repository.
 
 The GitHub repository also needs a description and topics in the repository settings. Suggested description:
 

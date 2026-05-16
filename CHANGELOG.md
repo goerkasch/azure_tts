@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Renamed the integration from Azure Dragon TTS to Azure Speech TTS, including
+  the Home Assistant domain and folder path from `azure_dragon_tts` to
+  `azure_speech_tts`.
 - Stream Azure audio chunks through modern Home Assistant TTS responses instead of buffering the full audio first.
 - Treat `style: none` as disabled during synthesis, including YAML and older saved options.
 
