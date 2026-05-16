@@ -198,18 +198,31 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
 
         options = request.options or {}
         output_format = options.get(CONF_OUTPUT_FORMAT, self._output_format)
-        audio = await self._synthesize("".join(parts), request.language or self._language, options)
 
         async def audio_gen() -> AsyncGenerator[bytes, None]:
-            yield audio
+            async for chunk in self._stream_synthesize(
+                "".join(parts), request.language or self._language, options
+            ):
+                yield chunk
 
-        return TTSAudioResponse(extension=_audio_extension(output_format), data_gen=audio_gen())
+        return TTSAudioResponse(
+            extension=_audio_extension(output_format), data_gen=audio_gen()
+        )
 
     async def _synthesize(self, message: str, language: str, options: dict[str, Any]) -> bytes:
         """Send SSML to Azure and return audio bytes."""
+        chunks = [
+            chunk async for chunk in self._stream_synthesize(message, language, options)
+        ]
+        return b"".join(chunks)
+
+    async def _stream_synthesize(
+        self, message: str, language: str, options: dict[str, Any]
+    ) -> AsyncGenerator[bytes, None]:
+        """Send SSML to Azure and yield audio bytes as Azure provides them."""
         voice = options.get(CONF_VOICE, self._voice)
         output_format = options.get(CONF_OUTPUT_FORMAT, self._output_format)
-        style = options.get(CONF_STYLE, self._style)
+        style = _normalize_style(options.get(CONF_STYLE, self._style))
         rate = options.get(CONF_RATE, self._rate)
         pitch = options.get(CONF_PITCH, self._pitch)
 
@@ -231,16 +244,21 @@ class AzureDragonTtsEntity(TextToSpeechEntity):
             async with session.post(
                 url, data=ssml.encode("utf-8"), headers=headers
             ) as response:
-                body = await response.read()
                 if response.status != 200:
+                    body = await response.read()
                     text = body.decode("utf-8", errors="ignore").strip()
                     _LOGGER.error("Azure TTS failed: HTTP %s: %s", response.status, text)
                     raise HomeAssistantError(
                         f"Azure TTS failed with HTTP {response.status}: {text}"
                     )
-                if not body:
+                has_audio = False
+                async for chunk in response.content.iter_chunked(8192):
+                    if not chunk:
+                        continue
+                    has_audio = True
+                    yield chunk
+                if not has_audio:
                     raise HomeAssistantError("Azure TTS returned an empty audio response")
-                return body
         except ClientError as err:
             raise HomeAssistantError(f"Could not connect to Azure TTS: {err}") from err
 
@@ -284,6 +302,16 @@ def _audio_extension(output_format: str) -> str:
         if marker in output_format:
             return extension
     return "mp3"
+
+
+def _normalize_style(style: Any) -> str | None:
+    """Return an Azure speaking style, or None when style is disabled."""
+    if not style:
+        return None
+    style = str(style).strip()
+    if not style or style.lower() == "none":
+        return None
+    return style
 
 
 def _voice_matches_language(voice: dict[str, Any], language: str) -> bool:

@@ -192,8 +192,12 @@ Tips:
 
 - Use the Azure region closest to your Home Assistant instance.
 - Keep frequently used announcements short.
+- Use `style: none` when you do not need Azure speaking styles.
 - Prefer MP3 output formats for broad media player compatibility.
 - For repeated identical messages, Home Assistant's TTS cache may make later playback faster.
+
+Modern Home Assistant TTS pipelines receive Azure audio chunks as they arrive, avoiding
+an extra full-response buffer before playback can be handed off.
 
 ## YAML fallback
 

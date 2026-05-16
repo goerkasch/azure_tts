@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Stream Azure audio chunks through modern Home Assistant TTS responses instead of buffering the full audio first.
+- Treat `style: none` as disabled during synthesis, including YAML and older saved options.
+
 ## 0.4.2 - 2026-05-14
 
 - Replaced dynamic style loading with one fixed full style dropdown list.
