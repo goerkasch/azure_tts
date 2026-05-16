@@ -16,7 +16,7 @@ After installation, restart Home Assistant and add the integration from:
 Settings > Devices & services > Add integration > Azure Speech TTS
 ```
 
-For updates, use GitHub releases such as `v0.4.2`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
+For updates, use GitHub releases such as `v0.5.0`. HACS can install the default branch, but without a GitHub release it may show the latest commit hash as the version, for example `de0cac5`, instead of a valid release version.
 
 ### Renaming from Azure Dragon TTS
 
